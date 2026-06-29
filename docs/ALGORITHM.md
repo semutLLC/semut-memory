@@ -2,241 +2,232 @@
 
 ## Overview
 
-Semut Memory transforms raw traces into persistent memory.
+Semut Memory preserves reusable action history.
 
-Unlike traditional storage systems that periodically save complete snapshots, Semut Memory stores only meaningful state transitions. Every stored transition becomes a branch that can later be reconstructed, analyzed, or reused.
+Instead of organizing memory around individual entities, Semut Memory organizes memory around meaningful actions and the actions that historically followed them.
 
-The goal is not to preserve every event, but to preserve the minimum information necessary to reconstruct meaningful history.
+Every completed action becomes a reusable memory node.
 
----
+Every observed continuation becomes a branch.
 
-# Core Concepts
-
-## Root
-
-Every entity begins with a root state.
-
-Examples:
-
-* A business profile
-* A Git repository
-* A customer profile
-* A conversation
-* A digital assistant
-
-The root acts as the anchor for all future memory.
-
-```
-Root
-```
+The result is a continuously growing graph of historical coordination.
 
 ---
 
-## Trace
+# Core Concept
 
-Every interaction produces traces.
+Traditional systems ask:
 
-Examples:
+> What is the current state?
 
-* Customer submitted a request
-* AI generated a draft
-* Employee completed a task
-* Sensor produced a reading
+Semut Memory asks:
 
-Most traces are temporary.
+> Given this action, what actions historically followed?
 
----
+Every meaningful action becomes a reusable memory node.
 
-## Semantic Delta
+```text
+Action Node
 
-Incoming traces are compared against the current reconstructed state.
-
-The system estimates whether the trace creates a meaningful state transition.
-
-Examples:
-
-* Customer accepted a quote
-* Business changed operating hours
-* Employee joined the company
-* AI received new long-term instructions
-
-Minor or reversible events are typically discarded.
-
----
-
-## Witness
-
-Before becoming permanent memory, a semantic delta should be verified.
-
-Possible witnesses include:
-
-* Human confirmation
-* Multiple AI agreement
-* Digital signature
-* Successful transaction
-* Trusted sensor
-
-The witness mechanism improves trust and reduces noise.
-
----
-
-## Branch
-
-A verified semantic delta becomes a branch.
-
-```
-Root
- │
- ├── Branch 1
- ├── Branch 2
- └── Branch 3
+Customer Accepted Quote
 ```
 
-Each branch represents an irreversible or significant change in history.
+Historical continuations become branches.
 
----
-
-## Reconstruction
-
-Current state is reconstructed by applying branches to the root.
-
-```
-Current State
-
-=
-Root
-+ Branch 1
-+ Branch 2
-+ Branch 3
-```
-
-AI does not need every intermediate event.
-
-It only needs the root and the meaningful branches.
-
----
-
-## Compression
-
-Branches may be compressed.
-
-Examples:
-
-* Merge repeated identical updates
-* Aggregate repetitive sensor readings
-* Replace thousands of temporary edits with one confirmed outcome
-
-Compression should never destroy reconstructable history.
-
----
-
-## Recombination
-
-Stored branches remain reusable.
-
-Branches may be:
-
-* replayed
-* forked
-* merged
-* compared
-* simulated
-
-This allows AI to explore alternative futures without modifying historical memory.
-
----
-
-# Algorithm
-
-```
-Incoming Trace
+```text
+Customer Accepted Quote
         │
-        ▼
-Reconstruct Current State
-        │
-        ▼
-Compute Semantic Delta
-        │
-        ▼
-Significant?
-        │
-   ┌────┴────┐
-   │         │
- No          Yes
-   │         │
-Discard   Verify Witness
-              │
-              ▼
-      Create Branch
-              │
-              ▼
- Compress + Store Metadata
-              │
-              ▼
- Available for Reconstruction
+        ├── Schedule Visit
+        ├── Request Deposit
+        ├── Send Confirmation
+        └── Cancel
 ```
+
+The graph grows naturally as more traces are observed.
+
+---
+
+# Processing Pipeline
+
+## 1. Receive Trace
+
+Incoming traces arrive from:
+
+* humans
+* AI agents
+* businesses
+* sensors
+* software systems
+
+Example:
+
+```text
+Customer accepted quote.
+```
+
+---
+
+## 2. Locate Action Node
+
+Find the corresponding action node.
+
+If none exists:
+
+Create a new node.
+
+```text
+Customer Accepted Quote
+```
+
+---
+
+## 3. Observe Next Action
+
+Observe what happened next.
+
+Example:
+
+```text
+Customer Accepted Quote
+
+↓
+
+Schedule Visit
+```
+
+---
+
+## 4. Create or Update Branch
+
+Create the branch if it does not exist.
+
+Otherwise update its history.
+
+```text
+Customer Accepted Quote
+        │
+        ├── Schedule Visit
+        ├── Request Deposit
+        └── Cancel
+```
+
+Each branch stores metadata such as:
+
+* occurrence count
+* timestamps
+* confidence
+* witnesses
+* context
+* tags
+
+---
+
+## 5. Continue
+
+Every next action becomes another action node.
+
+```text
+Schedule Visit
+        │
+        ├── Technician Assigned
+        ├── Customer Rescheduled
+        └── Visit Cancelled
+```
+
+The graph continuously expands.
+
+---
+
+# Reconstruction
+
+An entity's history can be reconstructed by following its sequence of action nodes.
+
+Example:
+
+```text
+Quote Requested
+        │
+Accepted Quote
+        │
+Schedule Visit
+        │
+Job Completed
+        │
+Review Received
+```
+
+Semut Memory therefore stores reusable coordination rather than isolated timelines.
+
+---
+
+# Relationship to Knowledge
+
+Memory does not determine which path is best.
+
+Memory only records observed continuations.
+
+Knowledge analyzes many action graphs to answer questions such as:
+
+* Which branch occurs most often?
+* Which branch produces better outcomes?
+* Which branch is faster?
+* Which branch is more reliable?
+* Which branch should be recommended?
+
+Knowledge transforms historical memory into reusable guidance.
 
 ---
 
 # Example
 
-Restaurant:
+Action Node
 
-```
-Root
-Hours: 9–5
-Menu: Version 1
-Employees: 3
+```text
+Job Completed
 ```
 
-Customer places an order.
+Historical branches
 
-No permanent state change.
-
-Discard.
-
-Owner changes hours.
-
+```text
+Job Completed
+        │
+        ├── Send Invoice
+        ├── Request Review
+        ├── Schedule Follow-up
+        ├── Close Ticket
+        └── Ask for Referral
 ```
-Branch A
 
-Hours:
-9–5
+Memory records every observed continuation.
+
+Knowledge later discovers that:
+
+```text
+Job Completed
 
 ↓
 
-10–8
+Request Review
+
+↓
+
+Repeat Customer
 ```
 
-Store.
+occurs significantly more often than alternative paths.
 
-Owner hires a new employee.
+The recommendation belongs to Knowledge.
 
-```
-Branch B
-
-Employees:
-+1
-```
-
-Store.
-
-Current restaurant state becomes:
-
-```
-Root
-+ Branch A
-+ Branch B
-```
+The history belongs to Memory.
 
 ---
 
-# Relationship to Semut
+# Design Principles
 
-Semut Layer Model describes **what emerges**:
-
-Trace → Memory → Knowledge → Norm → Institution
-
-Semut Memory defines **how the Memory layer operates**.
-
-It determines which traces become durable memory through semantic state transitions, branching, reconstruction, and recombination.
+* Every meaningful action becomes a reusable memory node.
+* Every observed continuation becomes a branch.
+* Memory is append-only.
+* Memory stores history, not recommendations.
+* Current state is reconstructed by following action paths.
+* Knowledge analyzes memory but does not modify historical memory.
+* New traces continuously expand the graph.
