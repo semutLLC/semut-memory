@@ -2,33 +2,17 @@
 
 ## Overview
 
-Semut Memory represents history as an Action Graph.
+The Action Graph is the primary coordination memory of Semut.
 
-Instead of organizing memory around individual entities, the Action Graph organizes memory around reusable actions and the actions that historically followed them.
+Instead of organizing memory around documents or entities, Semut organizes memory around meaningful actions and the actions that historically followed them.
 
-Each meaningful action becomes a reusable memory node.
+Artifacts are stored separately.
 
-Each observed continuation becomes a branch.
-
-The graph continuously grows as more traces are recorded.
+The Action Graph stores only coordination history.
 
 ---
 
-# Why an Action Graph?
-
-Traditional systems primarily answer:
-
-> What is the current state?
-
-Semut Memory instead asks:
-
-> Given this action, what usually happened next?
-
-This allows historical experience to be reused across different businesses, users, and domains.
-
----
-
-# Action Node
+# Action Nodes
 
 Every meaningful completed action becomes an Action Node.
 
@@ -36,72 +20,83 @@ Examples:
 
 * Quote Requested
 * Quote Accepted
-* Deposit Received
-* Technician Assigned
+* Job Scheduled
 * Job Completed
 * Review Received
 * Payment Failed
 
-Action Nodes are reusable.
-
-Thousands of independent entities may contribute to the same node.
+Action Nodes are reusable across all entities.
 
 ---
 
-# Branches
+# Action Transitions
 
-Every observed next action becomes a branch.
+Observed continuations become transitions.
 
 Example:
 
-```text
+```text 
 Quote Accepted
-        │
-        ├── Schedule Visit
-        ├── Request Deposit
-        ├── Send Confirmation
-        └── Cancel
+│
+├── Schedule Visit
+├── Request Deposit
+├── Send Confirmation
+└── Cancel
 ```
 
-Each branch stores historical observations rather than recommendations.
-
-Possible metadata:
-
-* occurrence count
-* timestamps
-* confidence
-* witnesses
-* context
-* business category
-* tags
+The graph grows continuously as new traces arrive.
 
 ---
 
-# Continuous Expansion
+# Action Instances
 
-Every destination becomes another Action Node.
-
-```text
-Schedule Visit
-        │
-        ├── Technician Assigned
-        ├── Customer Rescheduled
-        ├── Visit Cancelled
-        └── Reminder Sent
-```
-
-The graph therefore grows naturally without requiring predefined workflows.
-
----
-
-# Entity History
-
-Although memory is stored as an Action Graph, individual histories remain reconstructable.
+Every observation creates an Action Instance.
 
 Example:
 
-```text
-Business A
+Action:
+Job Completed
+
+Metadata:
+
+* timestamp
+* business
+* customer
+* artifact references
+* confidence
+
+Action Instances contribute to the shared Action Graph.
+
+---
+
+# Artifact References
+
+The Action Graph does not duplicate artifacts.
+
+Instead, Action Instances reference them.
+
+Example:
+
+Action:
+
+Quote Sent
+
+Artifacts:
+
+* quote.pdf
+* email thread
+* images
+* notes
+
+Artifact storage is handled by Semut Artifact Memory.
+
+---
+
+# Entity Histories
+
+Individual histories are reconstructed by following Action Instances.
+
+Business A:
 
 Quote Requested
 
@@ -120,107 +115,22 @@ Job Completed
 ↓
 
 Review Received
-```
 
-Another business may follow:
-
-```text
-Business B
-
-Quote Requested
-
-↓
-
-Quote Accepted
-
-↓
-
-Request Deposit
-
-↓
-
-Schedule Visit
-
-↓
-
-Job Completed
-```
-
-Both businesses contribute to the same Action Graph while maintaining separate historical timelines.
+Multiple businesses contribute to the same shared Action Graph while preserving separate histories.
 
 ---
 
 # Relationship to Knowledge
 
-Memory stores observations.
+Memory records observed transitions.
 
-Knowledge analyzes observations.
+Knowledge analyzes the graph to discover:
 
-Memory answers:
+* common continuations
+* successful workflows
+* recurring coordination patterns
+* recommended next actions
 
-* What happened?
-* What happened next?
-* How often?
+The Action Graph remains an objective historical record.
 
-Knowledge answers:
-
-* Which branch is most successful?
-* Which branch is fastest?
-* Which branch is most reliable?
-* Which branch should be recommended?
-
-Knowledge never rewrites historical memory.
-
----
-
-# Example
-
-Action Node
-
-```text
-Job Completed
-```
-
-Historical branches
-
-```text
-Job Completed
-        │
-        ├── Send Invoice
-        ├── Request Review
-        ├── Schedule Follow-up
-        ├── Ask for Referral
-        └── Close Ticket
-```
-
-Knowledge may later determine that:
-
-```text
-Job Completed
-
-↓
-
-Request Review
-
-↓
-
-Repeat Customer
-```
-
-produces better long-term outcomes.
-
-The recommendation belongs to Knowledge.
-
-The observations remain in Memory.
-
----
-
-# Design Principles
-
-* Memory is action-centric rather than entity-centric.
-* Every meaningful action becomes reusable.
-* Branches represent observed continuations.
-* History is append-only.
-* Individual timelines are reconstructed from action paths.
-* Knowledge is built by analyzing many action graphs.
-* The graph continuously evolves as new traces are recorded.
+Recommendations belong to the Knowledge layer.
