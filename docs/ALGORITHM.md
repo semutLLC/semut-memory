@@ -2,232 +2,150 @@
 
 ## Overview
 
-Semut Memory preserves reusable action history.
+Semut Memory transforms traces into reusable coordination memory.
 
-Instead of organizing memory around individual entities, Semut Memory organizes memory around meaningful actions and the actions that historically followed them.
+The system separates two kinds of memory:
 
-Every completed action becomes a reusable memory node.
+1. **Action Memory** — records meaningful action transitions for coordination.
+2. **Artifact Memory** — preserves documents, code, images, conversations, and other artifacts efficiently.
 
-Every observed continuation becomes a branch.
+Action Memory answers:
 
-The result is a continuously growing graph of historical coordination.
+> What happened next?
+
+Artifact Memory answers:
+
+> How can the original artifact be reconstructed?
 
 ---
 
-# Core Concept
-
-Traditional systems ask:
-
-> What is the current state?
-
-Semut Memory asks:
-
-> Given this action, what actions historically followed?
-
-Every meaningful action becomes a reusable memory node.
+# Architecture
 
 ```text
-Action Node
-
-Customer Accepted Quote
+                 Incoming Trace
+                        │
+        ┌───────────────┴───────────────┐
+        │                               │
+        ▼                               ▼
+ Action Instance                 Artifact Update
+        │                               │
+        ▼                               ▼
+   Action Graph                 Root + Delta Storage
+        │                               │
+        └───────────────┬───────────────┘
+                        ▼
+                  Knowledge Layer
+                        ▼
+               Recommended Actions
 ```
-
-Historical continuations become branches.
-
-```text
-Customer Accepted Quote
-        │
-        ├── Schedule Visit
-        ├── Request Deposit
-        ├── Send Confirmation
-        └── Cancel
-```
-
-The graph grows naturally as more traces are observed.
 
 ---
 
 # Processing Pipeline
 
-## 1. Receive Trace
+## Step 1 — Receive Trace
 
-Incoming traces arrive from:
+Incoming traces may originate from:
 
 * humans
 * AI agents
 * businesses
 * sensors
-* software systems
+* external systems
 
 Example:
 
-```text
 Customer accepted quote.
-```
 
 ---
 
-## 2. Locate Action Node
+## Step 2 — Create Action Instance
 
-Find the corresponding action node.
+Create an immutable record describing:
 
-If none exists:
-
-Create a new node.
-
-```text
-Customer Accepted Quote
-```
-
----
-
-## 3. Observe Next Action
-
-Observe what happened next.
+* action
+* timestamp
+* optional actor
+* optional entity
+* related artifacts
 
 Example:
 
-```text
 Customer Accepted Quote
 
-↓
-
-Schedule Visit
-```
-
 ---
 
-## 4. Create or Update Branch
+## Step 3 — Update Action Graph
 
-Create the branch if it does not exist.
+Locate the Action Node.
 
-Otherwise update its history.
+If it does not exist:
 
-```text
-Customer Accepted Quote
-        │
-        ├── Schedule Visit
-        ├── Request Deposit
-        └── Cancel
-```
+Create it.
 
-Each branch stores metadata such as:
+Observe the next action.
 
-* occurrence count
-* timestamps
-* confidence
-* witnesses
-* context
-* tags
-
----
-
-## 5. Continue
-
-Every next action becomes another action node.
-
-```text
-Schedule Visit
-        │
-        ├── Technician Assigned
-        ├── Customer Rescheduled
-        └── Visit Cancelled
-```
-
-The graph continuously expands.
-
----
-
-# Reconstruction
-
-An entity's history can be reconstructed by following its sequence of action nodes.
+Create or update the transition.
 
 Example:
 
-```text
-Quote Requested
-        │
-Accepted Quote
-        │
+Customer Accepted Quote
+
+↓
+
 Schedule Visit
-        │
-Job Completed
-        │
-Review Received
-```
-
-Semut Memory therefore stores reusable coordination rather than isolated timelines.
 
 ---
 
-# Relationship to Knowledge
+## Step 4 — Update Artifact Memory
 
-Memory does not determine which path is best.
+If the trace modifies an artifact:
 
-Memory only records observed continuations.
+* locate artifact root
+* compute delta
+* store delta
+* preserve reconstruction history
 
-Knowledge analyzes many action graphs to answer questions such as:
-
-* Which branch occurs most often?
-* Which branch produces better outcomes?
-* Which branch is faster?
-* Which branch is more reliable?
-* Which branch should be recommended?
-
-Knowledge transforms historical memory into reusable guidance.
+Artifacts are stored independently from the Action Graph.
 
 ---
 
-# Example
+## Step 5 — Expose Memory
 
-Action Node
+Semut Memory exposes:
 
-```text
-Job Completed
-```
+* action transitions
+* artifact references
 
-Historical branches
-
-```text
-Job Completed
-        │
-        ├── Send Invoice
-        ├── Request Review
-        ├── Schedule Follow-up
-        ├── Close Ticket
-        └── Ask for Referral
-```
-
-Memory records every observed continuation.
-
-Knowledge later discovers that:
-
-```text
-Job Completed
-
-↓
-
-Request Review
-
-↓
-
-Repeat Customer
-```
-
-occurs significantly more often than alternative paths.
-
-The recommendation belongs to Knowledge.
-
-The history belongs to Memory.
+Knowledge consumes these memories to discover reusable patterns.
 
 ---
 
-# Design Principles
+# Responsibilities
 
-* Every meaningful action becomes a reusable memory node.
-* Every observed continuation becomes a branch.
-* Memory is append-only.
-* Memory stores history, not recommendations.
-* Current state is reconstructed by following action paths.
-* Knowledge analyzes memory but does not modify historical memory.
-* New traces continuously expand the graph.
+## Action Memory
+
+Responsible for:
+
+* action transitions
+* coordination history
+* reconstructing action sequences
+
+## Artifact Memory
+
+Responsible for:
+
+* artifact preservation
+* version history
+* reconstruction
+* efficient storage
+
+## Knowledge
+
+Responsible for:
+
+* discovering patterns
+* recommending next actions
+* extracting reusable workflows
+
+Knowledge never modifies historical memory.
