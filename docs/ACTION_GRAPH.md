@@ -29,6 +29,34 @@ Action Nodes are reusable across all entities.
 
 ---
 
+# Action Node Identity
+
+Action Nodes are not required to be globally identical.
+
+Different domains may contain different Action Nodes that later converge into similar coordination structures.
+
+Example:
+
+Customer Accepted Quote
+
+↓
+
+Schedule Visit
+
+and
+
+Patient Consented
+
+↓
+
+Schedule Visit
+
+remain separate Action Nodes.
+
+Knowledge may later discover that both participate in a similar coordination pattern.
+
+Normalization is performed by the Knowledge layer rather than the Memory layer.
+
 # Action Transitions
 
 Observed continuations become transitions.
