@@ -37,6 +37,16 @@ Artifact Memory answers:
                   Knowledge Layer
                         ▼
                Recommended Actions
+                        ▼
+                      AI Agent
+                         │
+                "How do we do it?"
+                         │
+                         ▼
+                  Execution Graph
+                         │
+                         ▼
+                Tools / APIs / Browser
 ```
 
 ---
