@@ -10,6 +10,8 @@ Artifacts are stored separately.
 
 The Action Graph stores only coordination history.
 
+The Action Graph describes coordination rather than execution. Once a next action is selected, an AI agent or execution engine translates it into executable operations using an Execution Graph. This separation allows coordination knowledge to remain stable while execution methods evolve with software and hardware.
+
 ---
 
 # Action Nodes
