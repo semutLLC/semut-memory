@@ -2,6 +2,7 @@
 ```
 ├── Action Memory
 │     ├── Action Graph
+│     ├── Execution Graph
 │     └── Action Instances
 │
 ├── Artifact Memory
